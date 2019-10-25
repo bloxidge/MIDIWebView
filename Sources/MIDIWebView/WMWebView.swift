@@ -7,17 +7,17 @@
 
 import WebKit
 
-class WMWebView: WKWebView {
+public class WMWebView: WKWebView {
     
-    override init(frame: CGRect, configuration: WKWebViewConfiguration) {
+    override public init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         super.init(coder: coder)
     }
     
-    override func awakeFromNib() {
+    override public func awakeFromNib() {
         super.awakeFromNib()
 
         let scriptString = "setInterval(() => console.log(\"This was called from WMWebView\"), 1000)"
