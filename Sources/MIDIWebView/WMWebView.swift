@@ -9,6 +9,8 @@ import WebKit
 
 public class WMWebView: WKWebView {
     
+    private let handler = MIDIMessageHandler()
+    
     override public init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
     }
@@ -19,9 +21,19 @@ public class WMWebView: WKWebView {
     
     override public func awakeFromNib() {
         super.awakeFromNib()
-
-        let scriptString = "setInterval(() => console.log(\"This was called from WMWebView\"), 1000)"
-        let script = WKUserScript(source: scriptString, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+        
+        guard let polyfillPath = Bundle.main.path(forResource: "WebMIDIAPIPolyfill", ofType: "js") else {
+            return
+        }
+        guard let polyfillScript = try? String(contentsOfFile: polyfillPath, encoding: .utf8) else {
+            return
+        }
+        let script = WKUserScript(source: polyfillScript, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+            
+        // Inject Web MIDI API bridge JavaScript
         configuration.userContentController.addUserScript(script)
+        configuration.userContentController.add(handler, name: "onready")
+        configuration.userContentController.add(handler, name: "send")
+        configuration.userContentController.add(handler, name: "clear")
     }
 }
