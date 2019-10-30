@@ -1,0 +1,18 @@
+{
+  "name": "midiwebviewpolyfill",
+  "version": "0.0.0",
+  "description": "Javascript polyfill for WebMIDI API, made to work with MIDIWebView Swift package.",
+  "main": "index.js",
+  "author": "Peter Bloxidge",
+  "license": "ISC",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "parcel": "^1.12.4",
+    "rimraf": "^3.0.0"
+  },
+  "scripts": {
+    "build": "run-s private:clean private:build",
+    "private:build": "parcel build index.js --public-url ./ --out-file MIDIWebViewPolyfill.js",
+    "private:clean": "rimraf dist"
+  }
+}
