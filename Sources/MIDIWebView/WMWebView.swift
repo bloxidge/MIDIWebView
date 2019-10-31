@@ -22,7 +22,7 @@ public class WMWebView: WKWebView {
     override public func awakeFromNib() {
         super.awakeFromNib()
         
-        guard let polyfillPath = Bundle.main.path(forResource: "WebMIDIAPIPolyfill", ofType: "js") else {
+        guard let polyfillPath = Bundle.main.path(forResource: "MIDIWebViewPolyfill", ofType: "js") else {
             return
         }
         guard let polyfillScript = try? String(contentsOfFile: polyfillPath, encoding: .utf8) else {
