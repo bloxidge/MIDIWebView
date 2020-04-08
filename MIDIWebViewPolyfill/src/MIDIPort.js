@@ -24,7 +24,7 @@ class MIDIPort extends MIDIEventDispatcher {
     }
 
     _setConnection(newState) {
-        if (this.connection != newState) {
+        if (this.connection !== newState) {
             this.connection = newState;
 
             var evt = document.createEvent("Event");
@@ -32,14 +32,14 @@ class MIDIPort extends MIDIEventDispatcher {
             evt.port = this;
             this.dispatchEvent(evt);
 
-            if (this._midiaccess != null) {
+            if (this._midiaccess) {
                 this._midiaccess.dispatchEvent(evt);
             }
         }
     };
 
     _setState(newState) {
-        if (this.state != newState) {
+        if (this.state !== newState) {
             this.state = newState;
 
             var evt = document.createEvent("Event");
@@ -47,7 +47,7 @@ class MIDIPort extends MIDIEventDispatcher {
             evt.port = this;
             this.dispatchEvent(evt);
 
-            if (this._midiaccess != null) {
+            if (this._midiaccess) {
                 this._midiaccess.dispatchEvent(evt);
             }
         }

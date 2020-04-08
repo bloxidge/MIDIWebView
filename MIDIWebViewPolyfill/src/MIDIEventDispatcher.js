@@ -5,7 +5,7 @@ class MIDIEventDispatcher {
 
     addEventListener(type, callback) {
         const listeners = this._listeners[type];
-        if (!listeners) {
+        if (listeners) {
             for (let i = 0; i < listeners.length; i++) {
                 if (listeners[i] === callback) {
                     return;
@@ -20,7 +20,7 @@ class MIDIEventDispatcher {
 
     removeEventListener(type, callback) {
         const listeners = this._listeners[type];
-        if (!listeners) {
+        if (listeners) {
             for (let i = 0; i < listeners.length; i++) {
                 if (listeners[i] === callback) {
                     this._listeners[type].splice( i, 1 );  //remove it
@@ -37,27 +37,36 @@ class MIDIEventDispatcher {
     dispatchEvent(event) {
         this._pvtDef = false;
 
+        const rawEvent = Object.assign({}, event, { target: this, currentTarget: this });
+
         const listeners = this._listeners[event.type];
-        if (!listeners) {
+        if (listeners) {
             // dispatch to listeners
             for (let i = 0; i < listeners.length; i++) {
                 if (listeners[i].handleEvent) {
-                    listeners[i].handleEvent.bind(this)(event);
+                    listeners[i].handleEvent.bind(this)(rawEvent);
                 } else {
-                    listeners[i].bind(this)(event);
+                    listeners[i].bind(this)(rawEvent);
                 }
             }
         }
 
+        console.warn("Ready to dispatch event:");
+        console.warn(event);
+
         switch (event.type) {
         case "midimessage":
             if (this.onmidimessage) {
-                this.onmidimessage(event);
+                this.onmidimessage(rawEvent);
             }
             break;
         case "statechange":
+            console.warn("It's an statechange event!");
             if (this.onstatechange) {
-                this.onstatechange(event);
+                console.warn("and it exists!");
+                this.onstatechange(rawEvent);
+            } else {
+                console.warn("but it doesn't exist!");
             }
             break;
         }

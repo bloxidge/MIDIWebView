@@ -20,6 +20,14 @@ class MIDIAccess extends MIDIEventDispatcher {
         this.inputs = null;
         this.outputs = null;
 
+        this._callback_onReady = this._callback_onReady.bind(this);
+        this._callback_onNotReady = this._callback_onNotReady.bind(this);
+        this._callback_receiveMIDIMessage = this._callback_receiveMIDIMessage.bind(this);
+        this._callback_addDestination = this._callback_addDestination.bind(this);
+        this._callback_addSource = this._callback_addSource.bind(this);
+        this._callback_removeDestination = this._callback_removeDestination.bind(this);
+        this._callback_removeSource = this._callback_removeSource.bind(this);
+
         if (typeof options !== "undefined") {
             if (options['sysex'] == true || options['sysex'] == "true") {
                 this._sysexAccessRequested = true;
@@ -67,7 +75,7 @@ class MIDIAccess extends MIDIEventDispatcher {
 
         evt.initEvent( "midimessage", false, false );
         evt.receivedTime = receivedTime + this._timestampOrigin;
-        evt.data = data;
+        evt.data = new Uint8Array(data);
 
         const input = this._inputs[index];
         if (input != null) {
@@ -76,7 +84,7 @@ class MIDIAccess extends MIDIEventDispatcher {
     }
 
     _callback_addDestination(index, portInfo) {
-        const evt = document.createEvent( "Event" );
+        const evt = document.createEvent("Event");
         const output = new MIDIOutput(portInfo.id, portInfo.name, portInfo.manufacturer, index, this);
 
         this._outputs.splice(index, 0, output);
@@ -85,13 +93,14 @@ class MIDIAccess extends MIDIEventDispatcher {
         output._setState(MIDIPortDeviceState.connected);
         output._setConnection(MIDIPortConnectionState.closed);
 
-        evt.initEvent( "statechange", false, false );
+        evt.initEvent("statechange", false, false);
         evt.port = output;
+
         this.dispatchEvent(evt);
     }
 
     _callback_addSource(index, portInfo) {
-        const evt = document.createEvent( "Event" );
+        const evt = document.createEvent("Event");
         const input = new MIDIInput(portInfo.id, portInfo.name, portInfo.manufacturer, index, this);
 
         this._inputs.splice(index, 0, input);
@@ -100,29 +109,42 @@ class MIDIAccess extends MIDIEventDispatcher {
         input._setState(MIDIPortDeviceState.connected);
         input._setConnection(MIDIPortConnectionState.closed);
 
-        evt.initEvent( "statechange", false, false );
+        evt.initEvent("statechange", false, false);
         evt.port = input;
+
         this.dispatchEvent(evt);
     }
 
     _callback_removeDestination(index) {
+        const evt = document.createEvent("Event");
         const output = this._outputs[index];
 
         output._setState(MIDIPortDeviceState.disconnected);
         output._setConnection(MIDIPortConnectionState.pending);
 
+        evt.initEvent("statechange", false, false);
+        evt.port = output;
+
         this._outputs.splice(index, 1);
         this.outputs = createMIDIPortMap(this._outputs);
+
+        this.dispatchEvent(evt);
     }
 
     _callback_removeSource(index) {
+        const evt = document.createEvent("Event");
         const input = this._inputs[index];
 
         input._setState(MIDIPortDeviceState.disconnected);
         input._setConnection(MIDIPortConnectionState.pending);
 
+        evt.initEvent("statechange", false, false);
+        evt.port = input;
+
         this._inputs.splice(index, 1);
         this.inputs = createMIDIPortMap(this._inputs);
+
+        this.dispatchEvent(evt);
     }
 }
 

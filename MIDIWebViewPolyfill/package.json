@@ -13,7 +13,10 @@
   },
   "scripts": {
     "build": "run-s private:clean private:build",
-    "private:build": "parcel build index.js --public-url ./ --out-file MIDIWebViewPolyfill.js",
+    "private:build": "NODE_ENV=development parcel build index.js --out-file MIDIWebViewPolyfill.js --no-source-maps --no-minify",
     "private:clean": "rimraf dist"
+  },
+  "dependencies": {
+    "typescript": "^3.6.4"
   }
 }

@@ -12,7 +12,7 @@ class MIDIInput extends MIDIPort {
 
     set onmidimessage(f) {
         this._onmidimessage = f;
-        if (this.connection === MIDIPortConnectionState) {
+        if (this.connection === MIDIPortConnectionState.closed) {
             this._setConnection(MIDIPortConnectionState.open);
         }
     }

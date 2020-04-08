@@ -22,18 +22,21 @@ public class WMWebView: WKWebView {
     override public func awakeFromNib() {
         super.awakeFromNib()
         
-        guard let polyfillPath = Bundle.main.path(forResource: "MIDIWebViewPolyfill", ofType: "js") else {
+        guard let polyfillPath = Bundle.main.path(forResource: "MIDIWebViewPolyfill", ofType: "js"),
+            let polyfillScriptString = try? String(contentsOfFile: polyfillPath, encoding: .utf8) else {
             return
         }
-        guard let polyfillScript = try? String(contentsOfFile: polyfillPath, encoding: .utf8) else {
-            return
-        }
-        let script = WKUserScript(source: polyfillScript, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+        let polyfillScript = WKUserScript(source: polyfillScriptString, injectionTime: .atDocumentStart, forMainFrameOnly: true)
             
         // Inject Web MIDI API bridge JavaScript
-        configuration.userContentController.addUserScript(script)
+        configuration.userContentController.addUserScript(polyfillScript)
         configuration.userContentController.add(handler, name: "onready")
         configuration.userContentController.add(handler, name: "send")
         configuration.userContentController.add(handler, name: "clear")
+        
+        // Inject console.log substitute
+//        let logScript = WKUserScript(source: "console.log = message => webkit.messageHandlers.log.postMessage(message)", injectionTime: .atDocumentStart, forMainFrameOnly: true)
+//        configuration.userContentController.addUserScript(logScript)
+//        configuration.userContentController.add(ConsoleMessageHandler(), name: "log")
     }
 }
